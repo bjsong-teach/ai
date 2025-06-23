@@ -1,0 +1,9 @@
+# requirements.txt
+fastapi
+uvicorn
+redis
+pydantic
+passlib[bcrypt]
+python-multipart
+python-jose[cryptography]
+Jinja2
