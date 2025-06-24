@@ -7,3 +7,4 @@ passlib[bcrypt]
 python-multipart
 python-jose[cryptography]
 Jinja2
+pydantic[email]

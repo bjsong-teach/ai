@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>홈</title>
+</head>
+<body>
+    <h1>환영합니다!</h1>
+    <p>사용자 관리 시스템에 오신 것을 환영합니다.</p>
+    <p><a href="/redis/users/register">회원가입</a></p>
+    <p><a href="/redis/users/login">로그인</a></p>
+    <button onclick="checkAuth()">인증 확인 (콘솔 확인)</button>
+    <script>
+        // 예시: API 호출 경로도 변경되어야 함
+        async function checkAuth() {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                alert('로그인되어 있지 않습니다.');
+                return;
+            }
+            try {
+                const response = await fetch('/redis/users/me', { // 경로 변경
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('인증된 사용자 정보:', data);
+                    alert(`로그인된 사용자: ${data.username}`);
+                } else {
+                    const errorData = await response.json();
+                    console.error('인증 실패:', errorData);
+                    alert(`인증 실패: ${errorData.detail}`);
+                    if (response.status === 401) {
+                        localStorage.removeItem('access_token');
+                        console.log('유효하지 않은 토큰으로 인해 토큰 삭제');
+                    }
+                }
+            } catch (error) {
+                console.error('API 호출 중 오류 발생:', error);
+                alert('API 호출 중 오류가 발생했습니다.');
+            }
+        }
+    </script>
+</body>
+</html>

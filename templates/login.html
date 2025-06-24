@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인</title>
+</head>
+<body>
+    <h1>로그인</h1>
+    <form id="loginForm" action="/redis/users/login" method="post"> <label for="username">사용자명:</label><br>
+        <input type="text" id="username" name="username" required><br><br>
+        <label for="password">비밀번호:</label><br>
+        <input type="password" id="password" name="password" required><br><br>
+        <button type="submit">로그인</button>
+    </form>
+    <div id="messageDiv"></div>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); // 기본 폼 제출 방지
+
+            const form = event.target;
+            const formData = new URLSearchParams();
+            formData.append('username', form.username.value);
+            formData.append('password', form.password.value);
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: formData.toString()
+                });
+                const messageDiv = document.getElementById('messageDiv');
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('access_token', data.access_token);
+                    messageDiv.textContent = '로그인 성공! 토큰이 저장되었습니다.';
+                    messageDiv.style.color = 'green';
+                    form.reset(); // 폼 초기화
+                } else {
+                    const errorData = await response.json();
+                    messageDiv.textContent = '로그인 실패: ' + errorData.detail;
+                    messageDiv.style.color = 'red';
+                }
+            } catch (error) {
+                const messageDiv = document.getElementById('messageDiv');
+                messageDiv.textContent = '네트워크 오류가 발생했습니다.';
+                messageDiv.style.color = 'red';
+                console.error('Error:', error);
+            }
+        });
+    </script>
+</body>
+</html>
